@@ -5,9 +5,6 @@ import static org.hamcrest.CoreMatchers.*;
 
 import org.junit.Test;
 
-import com.m12i.code.parse.Reader;
-import com.m12i.code.parse.Readers;
-import com.m12i.code.parse.Result;
 import com.m12i.minque.Expression;
 import com.m12i.minque.ExpressionParser;
 import com.m12i.minque.ExpressionParser.ExpressionAndPlaceholders;
@@ -18,17 +15,30 @@ public class ExpressionParserTest {
 	private static final ExpressionParser parser = new ExpressionParser();
 	
 	private static Expression parse(String expr) {
-		final Reader in = Readers.createReader(expr);
-		final Result<ExpressionAndPlaceholders> r = parser.parse(in);
-		if (r.failed) r.throwsError(in);
-		return r.value.expression;
+		final ExpressionAndPlaceholders r = parser.parse(expr);
+		return r.expression;
 	}
 	
 	@Test
 	public void parseTest00() {
-		assertThat(parser.parse("").failed, is(true));
-		assertThat(parser.parse(" ").failed, is(true));
-		assertThat(parser.parse(" \r\n ").failed, is(true));
+		try {
+			parser.parse("");
+			fail();
+		} catch (final ParseException e) {
+			// Ok.
+		}
+		try {
+			parser.parse(" ");
+			fail();
+		} catch (final ParseException e) {
+			// Ok.
+		}
+		try {
+			parser.parse(" \r\n ");
+			fail();
+		} catch (final ParseException e) {
+			// Ok.
+		}
 	}
 	
 	@Test

@@ -4,10 +4,6 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.m12i.code.parse.ParseError;
-import com.m12i.code.parse.Reader;
-import com.m12i.code.parse.Readers;
-import com.m12i.code.parse.Result;
 import com.m12i.minque.ExpressionParser.ExpressionAndPlaceholders;
 
 /**
@@ -106,15 +102,13 @@ public final class QueryFactory<E> {
 	 * 文字列として表現されたクエリをパースして解析済みクエリを生成する.
 	 * @param query クエリ文字列
 	 * @return 解析済みクエリ
-	 * @throws QueryParseException クエリ内容に問題があり解析に失敗した場合
+	 * @throws QueryParseException クエリのパースに失敗した場合
 	 */
 	public Query<E> create(String query) throws QueryParseException {
 		try {
-			final Reader in = Readers.createReader(query);
-			final Result<ExpressionAndPlaceholders> r = p.parse(in);
-			if (r.failed) r.throwsError(in);
-			return new QueryImpl<E>(r.value.expression, r.value.placeholders, a);
-		} catch (ParseError e) {
+			final ExpressionAndPlaceholders r = p.parse(query);
+			return new QueryImpl<E>(r.expression, r.placeholders, a);
+		} catch (final ParseException e) {
 			throw new QueryParseException(e);
 		}
 	}
