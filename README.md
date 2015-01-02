@@ -18,7 +18,7 @@ final Query query0 = factory.create("firstName == 'foo'");
 final List<Person> result0 = query0.selectFrom(target);
 
 // firstNameが'f'ではじまり'o'で終わるかlastNameが"bar"である要素を検索するクエリを作成
-final Query query1 = factory.create("(firstName ^= 'f' and firstName =$ 'o') or lastName == 'bar'");
+final Query query1 = factory.create("(firstName ^= 'f' and firstName $= 'o') or lastName == 'bar'");
 // 条件にマッチする1件だけを取得
 final Person result1 = query1.selectOneFrom(target);
 
