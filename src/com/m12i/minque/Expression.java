@@ -1,6 +1,6 @@
 package com.m12i.minque;
 
-class Expression {
+final class Expression {
 	private final String prop;
 	private final String value;
 	private final Expression left;

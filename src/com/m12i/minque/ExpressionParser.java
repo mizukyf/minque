@@ -5,7 +5,7 @@ import com.m12i.code.parse.ParseError;
 import com.m12i.code.parse.Reader;
 import com.m12i.code.parse.Result;
 
-class ExpressionParser extends AbstractParser<Expression> {
+final class ExpressionParser extends AbstractParser<Expression> {
 
 	public Result<Expression> parse(final Reader in) {
 		// 何はともあれ空白文字をスキップ

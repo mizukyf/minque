@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-class QueryImpl<E> implements Query<E> {
+final class QueryImpl<E> implements Query<E> {
 	private final Expression expression;
 	private final Accessor<E> accessor;
 	public QueryImpl(Expression expression, Accessor<E> accessor) {
