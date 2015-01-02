@@ -1,7 +1,6 @@
 package com.m12i.minque;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 final class QueryImpl<E> implements Query<E> {
@@ -17,7 +16,7 @@ final class QueryImpl<E> implements Query<E> {
 	}
 
 	@Override
-	public List<E> selectFrom(Collection<E> source) {
+	public List<E> selectFrom(Iterable<E> source) {
 		if (hasPlaceholders) {
 			throw new IllegalArgumentException("Bind variables is required for this query.");
 		}
@@ -31,7 +30,7 @@ final class QueryImpl<E> implements Query<E> {
 	}
 
 	@Override
-	public List<E> selectFrom(Collection<E> source, Object... vars) {
+	public List<E> selectFrom(Iterable<E> source, Object... vars) {
 		ph.bind(vars);
 		final List<E> result = new ArrayList<E>();
 		for (final E elem : source) {
@@ -43,7 +42,7 @@ final class QueryImpl<E> implements Query<E> {
 	}
 
 	@Override
-	public E selectOneFrom(Collection<E> source) {
+	public E selectOneFrom(Iterable<E> source) {
 		if (hasPlaceholders) {
 			throw new IllegalArgumentException("Bind variables is required for this query.");
 		}
@@ -56,7 +55,7 @@ final class QueryImpl<E> implements Query<E> {
 	}
 
 	@Override
-	public E selectOneFrom(Collection<E> source, Object... vars) {
+	public E selectOneFrom(Iterable<E> source, Object... vars) {
 		ph.bind(vars);
 		for (final E elem : source) {
 			if (evaluate(expression, elem)) {
