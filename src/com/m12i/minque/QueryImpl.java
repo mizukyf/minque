@@ -1,5 +1,7 @@
 package com.m12i.minque;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -138,6 +140,12 @@ final class QueryImpl<E> implements Query<E> {
 						} else if (actual instanceof Character && expected.length() == 1) {
 							c0 = (Character) actual;
 							c1 = expected.charAt(0);
+						} else if (actual instanceof BigDecimal) {
+							c0 = (BigDecimal) actual;
+							c1 = new BigDecimal(expected);
+						} else if (actual instanceof BigInteger) {
+							c0 = (BigInteger) actual;
+							c1 = new BigInteger(expected);
 						} else if (actual instanceof String) {
 							c0 = actual.toString();
 							c1 = expected;
