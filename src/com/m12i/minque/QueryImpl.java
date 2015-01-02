@@ -17,7 +17,7 @@ final class QueryImpl<E> implements Query<E> {
 	}
 
 	@Override
-	public List<E> selectAllFrom(Collection<E> source) {
+	public List<E> selectFrom(Collection<E> source) {
 		if (hasPlaceholders) {
 			throw new IllegalArgumentException("Bind variables is required for this query.");
 		}
@@ -31,7 +31,7 @@ final class QueryImpl<E> implements Query<E> {
 	}
 
 	@Override
-	public List<E> selectAllFrom(Collection<E> source, Object... vars) {
+	public List<E> selectFrom(Collection<E> source, Object... vars) {
 		ph.bind(vars);
 		final List<E> result = new ArrayList<E>();
 		for (final E elem : source) {

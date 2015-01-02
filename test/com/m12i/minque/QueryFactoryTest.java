@@ -62,7 +62,7 @@ public class QueryFactoryTest {
 		try {
 			// JavaBeansの規約どおりのケース
 			final Query<FooBarBean> query0 = factory.create("a == 1 and foo == 3");
-			assertThat(query0.selectAllFrom(beanList).size(), is(2));
+			assertThat(query0.selectFrom(beanList).size(), is(2));
 		} catch (QueryParseException e) {
 			e.printStackTrace();
 			fail();
@@ -75,7 +75,7 @@ public class QueryFactoryTest {
 		try {
 			// メソッドが存在しなければnullとみなされる
 			final Query<FooBarBean> query1 = factory.create("a == 1 and foo == 3 && baz is null");
-			assertThat(query1.selectAllFrom(beanList).size(), is(2));
+			assertThat(query1.selectFrom(beanList).size(), is(2));
 		} catch (QueryParseException e) {
 			e.printStackTrace();
 			fail();
@@ -88,7 +88,7 @@ public class QueryFactoryTest {
 		try {
 			// getBar()とbar()があればgetBar()がコールされる
 			final Query<FooBarBean> query2 = factory.create("a == 1 and foo == 3 && bar == BAR");
-			assertThat(query2.selectAllFrom(beanList).size(), is(2));
+			assertThat(query2.selectFrom(beanList).size(), is(2));
 		} catch (QueryParseException e) {
 			e.printStackTrace();
 			fail();
@@ -101,7 +101,7 @@ public class QueryFactoryTest {
 		try {
 			// getC()がなければc()がコールされる
 			final Query<FooBarBean> query3 = factory.create("a == 1 and foo == 3 && c == 3");
-			assertThat(query3.selectAllFrom(beanList).size(), is(1));
+			assertThat(query3.selectFrom(beanList).size(), is(1));
 		} catch (QueryParseException e) {
 			e.printStackTrace();
 			fail();
