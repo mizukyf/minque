@@ -22,8 +22,9 @@ final class ExpressionParser extends AbstractParser<ExpressionParser.ExpressionA
 			// 空文字列もしくは空白文字のみからなるクエリの場合はエラー
 			return Result.failure("Empty string.");
 		}
-		final Placeholders ph = new Placeholders();
+		
 		// それ以外の場合は再帰的にクエリを構文解析
+		final Placeholders ph = new Placeholders();
 		final Result<Expression> e = parseExpression(in, true, ph);
 		final ExpressionAndPlaceholders eph = new ExpressionAndPlaceholders(e.value, ph);
 		return Result.success(eph);
@@ -105,7 +106,9 @@ final class ExpressionParser extends AbstractParser<ExpressionParser.ExpressionA
 					value = parseNonQuotedString(in);
 					if (!value.successful) return Result.failure(value);
 					valExp = Expression.value(value.value);
-					if (value.value.equals("?")) ph.register(valExp);
+					if (value.value.equals("?")){
+						ph.register(valExp);
+					}
 				}
 				if (!value.successful) return Result.failure(value);
 				expr0 = Expression.comparative(Expression.property(prop), op.value, valExp);
@@ -209,7 +212,7 @@ final class ExpressionParser extends AbstractParser<ExpressionParser.ExpressionA
 			if (('0' <= c && c <= '9') || 
 					('A'  <= c && c <= 'Z') ||
 					('a' <= c && c <= 'z') ||
-					(c == '_' || c == '-')) {
+					(c == '_' || c == '-' || c == '?')) {
 				// 許された文字列であればバッファに追加して次に文字に進む
 				sb.append(c);
 				in.next();

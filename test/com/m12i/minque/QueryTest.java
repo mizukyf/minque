@@ -143,4 +143,13 @@ public class QueryTest {
 		assertThat(res.size(), is(3));
 	}
 
+	@Test
+	public void selectAllTest30() {
+		final Query<HashMap<String, String>> q0 = create("key0 == ?");
+		final List<HashMap<String, String>> res0 = q0.selectAllFrom(list1, "foo");
+		assertThat(res0.size(), is(2));
+		
+		final List<HashMap<String, String>> res1 = q0.selectAllFrom(list1, "hello");
+		assertThat(res1.size(), is(1));
+	}
 }
