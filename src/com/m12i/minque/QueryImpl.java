@@ -53,7 +53,7 @@ class QueryImpl<E> implements Query<E> {
 			} else if (op == Operator.STARTS_WITH) {
 				return actual.startsWith(expected);
 			} else {
-				throw new RuntimeException("Unsopported comparative expression.");
+				throw new RuntimeException("Unsupported comparative expression.");
 			}
 		} else {
 			final Operator op = expr.getOperator();
@@ -61,7 +61,7 @@ class QueryImpl<E> implements Query<E> {
 				if (op == Operator.NOT) {
 					return ! evaluate(expr.getRight(), elem);
 				} else {
-					throw new RuntimeException("Unsopported logical expression.");
+					throw new RuntimeException("Unsupported logical expression.");
 				}
 			} else {
 				final boolean leftResult = evaluate(expr.getLeft(), elem);
