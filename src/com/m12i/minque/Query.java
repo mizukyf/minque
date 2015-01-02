@@ -16,6 +16,7 @@ public interface Query<E> {
 	 * @return クエリ内容にマッチしたすべての要素
 	 */
 	List<E> selectAllFrom(Collection<E> source);
+	List<E> selectAllFrom(Collection<E> source, Object... vars);
 	/**
 	 * クエリにマッチした最初の要素を返す.
 	 * クエリにマッチする要素が複数あった場合にいずれの要素が「最初の」要素とみなされるかは、
@@ -25,4 +26,5 @@ public interface Query<E> {
 	 * @return クエリ内容にマッチした要素
 	 */
 	E selectOneFrom(Collection<E> source);
+	E selectOneFrom(Collection<E> source, Object... vars);
 }

@@ -2,7 +2,7 @@ package com.m12i.minque;
 
 final class Expression {
 	private final String prop;
-	private final String value;
+	private String value;
 	private final Expression left;
 	private final Operator op;
 	private final Expression right;
@@ -29,9 +29,12 @@ final class Expression {
 	public static Expression logical(Expression left, Operator binary, Expression right) {
 		return new Expression(null, null, left, binary, right);
 	}
+	public static Expression placeholder(int index) {
+		return new Expression(null, null, null, null, null);
+	}
 	
 	public boolean isLogical() {
-		return op == Operator.AND || op == Operator.OR || op == Operator.NOT;
+		return op != null && (op == Operator.AND || op == Operator.OR || op == Operator.NOT);
 	}
 	public final boolean isComparative() {
 		return op != null && ! isLogical();
@@ -53,6 +56,12 @@ final class Expression {
 	}
 	public String getValue() {
 		return isComparative() ? getRight().getValue() : value;
+	}
+	public void setValue(final String value) {
+		if (isValue()) {
+			if (value == null) throw new RuntimeException("Value must not be null.");
+			this.value = value;
+		}
 	}
 	public Expression getLeft() {
 		return left;

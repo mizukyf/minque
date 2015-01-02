@@ -8,6 +8,7 @@ import com.m12i.code.parse.ParseError;
 import com.m12i.code.parse.Reader;
 import com.m12i.code.parse.Readers;
 import com.m12i.code.parse.Result;
+import com.m12i.minque.ExpressionParser.ExpressionAndPlaceholders;
 
 /**
  * 文字列として表現されたクエリをパースして解析済みクエリを生成するファクトリ・オブジェクト.
@@ -110,9 +111,9 @@ public final class QueryFactory<E> {
 	public Query<E> create(String query) throws QueryParseException {
 		try {
 			final Reader in = Readers.createReader(query);
-			final Result<Expression> r = p.parse(in);
+			final Result<ExpressionAndPlaceholders> r = p.parse(in);
 			if (r.failed) r.throwsError(in);
-			return new QueryImpl<E>(r.value, a);
+			return new QueryImpl<E>(r.value.expression, r.value.placeholders, a);
 		} catch (ParseError e) {
 			throw new QueryParseException(e);
 		}

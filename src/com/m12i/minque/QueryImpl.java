@@ -7,13 +7,32 @@ import java.util.List;
 final class QueryImpl<E> implements Query<E> {
 	private final Expression expression;
 	private final Accessor<E> accessor;
-	public QueryImpl(Expression expression, Accessor<E> accessor) {
+	private final Placeholders ph;
+	private final boolean hasPlaceholders;
+	public QueryImpl(Expression expression, final Placeholders ph, Accessor<E> accessor) {
 		this.expression = expression;
 		this.accessor = accessor;
+		this.ph = ph;
+		this.hasPlaceholders = ph.amount() > 0;
 	}
 
 	@Override
 	public List<E> selectAllFrom(Collection<E> source) {
+		if (hasPlaceholders) {
+			throw new IllegalArgumentException("Bind variables is required for this query.");
+		}
+		final List<E> result = new ArrayList<E>();
+		for (final E elem : source) {
+			if (evaluate(expression, elem)) {
+				result.add(elem);
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public List<E> selectAllFrom(Collection<E> source, Object... vars) {
+		ph.bind(vars);
 		final List<E> result = new ArrayList<E>();
 		for (final E elem : source) {
 			if (evaluate(expression, elem)) {
@@ -25,6 +44,20 @@ final class QueryImpl<E> implements Query<E> {
 
 	@Override
 	public E selectOneFrom(Collection<E> source) {
+		if (hasPlaceholders) {
+			throw new IllegalArgumentException("Bind variables is required for this query.");
+		}
+		for (final E elem : source) {
+			if (evaluate(expression, elem)) {
+				return elem;
+			}
+		}
+		return null;
+	}
+
+	@Override
+	public E selectOneFrom(Collection<E> source, Object... vars) {
+		ph.bind(vars);
 		for (final E elem : source) {
 			if (evaluate(expression, elem)) {
 				return elem;

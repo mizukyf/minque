@@ -5,17 +5,28 @@ import com.m12i.code.parse.ParseError;
 import com.m12i.code.parse.Reader;
 import com.m12i.code.parse.Result;
 
-final class ExpressionParser extends AbstractParser<Expression> {
-
-	public Result<Expression> parse(final Reader in) {
+final class ExpressionParser extends AbstractParser<ExpressionParser.ExpressionAndPlaceholders> {
+	static final class ExpressionAndPlaceholders {
+		final Expression expression;
+		final Placeholders placeholders;
+		ExpressionAndPlaceholders(final Expression e, final Placeholders ph) {
+			this.expression = e;
+			this.placeholders = ph;
+		}
+	}
+	
+	public Result<ExpressionAndPlaceholders> parse(final Reader in) {
 		// 何はともあれ空白文字をスキップ
 		parsers.skipWhitespace(in);
 		if (in.hasReachedEof()) {
 			// 空文字列もしくは空白文字のみからなるクエリの場合はエラー
 			return Result.failure("Empty string.");
 		}
+		final Placeholders ph = new Placeholders();
 		// それ以外の場合は再帰的にクエリを構文解析
-		return parseExpression(in, true);
+		final Result<Expression> e = parseExpression(in, true, ph);
+		final ExpressionAndPlaceholders eph = new ExpressionAndPlaceholders(e.value, ph);
+		return Result.success(eph);
 	}
 	
 	/**
@@ -25,7 +36,7 @@ final class ExpressionParser extends AbstractParser<Expression> {
 	 * @return パースした式
 	 * @throws ParseError 構文エラーが見つかった場合
 	 */
-	private Result<Expression> parseExpression(final Reader in, final boolean recursive) {
+	private Result<Expression> parseExpression(final Reader in, final boolean recursive, final Placeholders ph) {
 		// 再帰呼び出し時を想定してとにかく空白文字をスキップ
 		parsers.skipWhitespace(in);
 		// 現在文字をチェック
@@ -34,7 +45,7 @@ final class ExpressionParser extends AbstractParser<Expression> {
 			in.next();
 			parsers.skipWhitespace(in);
 			// 単行論理演算子と右辺の式（これから再帰的にパースされる）をもとに論理演算オブジェクトを生成して返す
-			final Result<Expression> expr0 = parseExpression(in, true);
+			final Result<Expression> expr0 = parseExpression(in, true, ph);
 			if (expr0.successful) {
 				return Result.success(Expression.logical(Operator.NOT, expr0.value));
 			} else {
@@ -44,7 +55,7 @@ final class ExpressionParser extends AbstractParser<Expression> {
 			// 現在文字が"("であれば結合方法を制御する丸括弧の開始とみなして処理を進める
 			in.next();
 			// 括弧の内側にあるのはともかく何かしらの式だからそれをパースする
-			final Result<Expression> e = parseExpression(in, true);
+			final Result<Expression> e = parseExpression(in, true, ph);
 			if (!e.successful) {
 				return e;
 			}
@@ -59,7 +70,7 @@ final class ExpressionParser extends AbstractParser<Expression> {
 				return e;
 			} else {
 				// 再帰下降を許されている場合は後続の論理演算（もしあれば）も含めて処理した結果を返す
-				return parseLogical(in, e.value);
+				return parseLogical(in, e.value, ph);
 			}
 		} else {
 			// 現在文字が単行論理演算子でも丸括弧でもなかった場合は比較演算とみなして処理を進める
@@ -81,9 +92,23 @@ final class ExpressionParser extends AbstractParser<Expression> {
 			if (op.value == Operator.IS_NOT_NULL || op.value == Operator.IS_NULL) { 
 				expr0 = Expression.comparative(Expression.property(prop), op.value, Expression.value(null));
 			} else {
-				final Result<String> value =  parseValue(in);
+				final Result<String> value;
+				final Expression valExp;
+				final char c = in.current();
+				if (c == '"' || c == '\'') {
+					// 現在文字が引用符である場合は、引用符で囲われた文字列としてパース
+					value = parsers.parseQuotedString(in);
+					if (!value.successful) return Result.failure(value);
+					valExp = Expression.value(value.value);
+				} else {
+					// そうでない場合は、英数字とハイフンとアンダースコアのみからなる文字列としてパース
+					value = parseNonQuotedString(in);
+					if (!value.successful) return Result.failure(value);
+					valExp = Expression.value(value.value);
+					if (value.value.equals("?")) ph.register(valExp);
+				}
 				if (!value.successful) return Result.failure(value);
-				expr0 = Expression.comparative(Expression.property(prop), op.value, Expression.value(value.value));
+				expr0 = Expression.comparative(Expression.property(prop), op.value, valExp);
 			}
 			// 再帰下降オプションをチェック
 			if (!recursive) {
@@ -91,7 +116,7 @@ final class ExpressionParser extends AbstractParser<Expression> {
 				return Result.success(expr0);
 			} else {
 				// 再帰下降を許されている場合は後続の論理演算（もしあれば）も含めて処理した結果を返す
-				return parseLogical(in, expr0);
+				return parseLogical(in, expr0, ph);
 			}
 			
 		}
@@ -105,7 +130,7 @@ final class ExpressionParser extends AbstractParser<Expression> {
 	 * @return パースした式
 	 * @throws ParseError 構文エラーが見つかった場合
 	 */
-	private Result<Expression> parseLogical(final Reader in, final Expression left) {
+	private Result<Expression> parseLogical(final Reader in, final Expression left, final Placeholders ph) {
 		// まずは空白文字をスキップ
 		parsers.skipWhitespace(in);
 		// 現在文字をチェックして処理分岐
@@ -119,11 +144,11 @@ final class ExpressionParser extends AbstractParser<Expression> {
 			// 引数として渡された式（左辺）と最前パースした演算子、
 			// そしてこれからパースする式（右辺）で論理演算オブジェクトを構成して返す
 			// ＊ただし右辺の式をパースするにあたり「右結合」にならないよう再帰下降オプションはOFFにする
-			final Result<Expression> right = parseExpression(in, false);
+			final Result<Expression> right = parseExpression(in, false, ph);
 			if (!right.successful) {
 				return right;
 			} else {
-				return parseLogical(in, Expression.logical(left, Operator.AND, right.value));
+				return parseLogical(in, Expression.logical(left, Operator.AND, right.value), ph);
 			}
 		} else if (c0 == '&') {
 			// 現在文字が"&"ならば"&"が続かない限り構文エラー
@@ -131,11 +156,11 @@ final class ExpressionParser extends AbstractParser<Expression> {
 			in.next();
 			parsers.skipWhitespace(in);
 			// "and"の場合と同様に処理
-			final Result<Expression> right = parseExpression(in, false);
+			final Result<Expression> right = parseExpression(in, false, ph);
 			if (!right.successful) {
 				return right;
 			} else {
-				return parseLogical(in, Expression.logical(left, Operator.AND, right.value));
+				return parseLogical(in, Expression.logical(left, Operator.AND, right.value), ph);
 			}
 		} else if (c0 == 'o') {
 			// 現在文字が"o"ならば"r"が続かない限り構文エラー
@@ -143,11 +168,11 @@ final class ExpressionParser extends AbstractParser<Expression> {
 			in.next();
 			parsers.skipWhitespace(in);
 			// "and"の場合と同様に処理
-			final Result<Expression> right = parseExpression(in, false);
+			final Result<Expression> right = parseExpression(in, false, ph);
 			if (!right.successful) {
 				return right;
 			} else {
-				return parseLogical(in, Expression.logical(left, Operator.OR, right.value));
+				return parseLogical(in, Expression.logical(left, Operator.OR, right.value), ph);
 			}
 		} else if (c0 == '|') {
 			// 現在文字が"|"ならば"|"が続かない限り構文エラー
@@ -155,11 +180,11 @@ final class ExpressionParser extends AbstractParser<Expression> {
 			in.next();
 			parsers.skipWhitespace(in);
 			// "and"の場合と同様に処理
-			final Result<Expression> right = parseExpression(in, false);
+			final Result<Expression> right = parseExpression(in, false, ph);
 			if (!right.successful) {
 				return right;
 			} else {
-				return parseLogical(in, Expression.logical(left, Operator.OR, right.value));
+				return parseLogical(in, Expression.logical(left, Operator.OR, right.value), ph);
 			}
 		} else {
 			// 上記いずれのケースにも該当しないならば論理演算（演算子と右辺）は
@@ -197,23 +222,6 @@ final class ExpressionParser extends AbstractParser<Expression> {
 			return Result.success(sb.toString());
 		} else {
 			return Result.failure("Value is not found.");
-		}
-	}
-	
-	/**
-	 * 値（比較演算の右辺）をパースして返す.
-	 * @return パースした値
-	 * @throws ParseError 構文エラーが見つかった場合
-	 */
-	private Result<String> parseValue(final Reader in) {
-		// 現在文字をチェック
-		final char c = in.current();
-		if (c == '"' || c == '\'') {
-			// 現在文字が引用符である場合は、引用符で囲われた文字列としてパース
-			return parsers.parseQuotedString(in);
-		} else {
-			// そうでない場合は、英数字とハイフンとアンダースコアのみからなる文字列としてパース
-			return parseNonQuotedString(in);
 		}
 	}
 	

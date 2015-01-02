@@ -10,6 +10,7 @@ import com.m12i.code.parse.Readers;
 import com.m12i.code.parse.Result;
 import com.m12i.minque.Expression;
 import com.m12i.minque.ExpressionParser;
+import com.m12i.minque.ExpressionParser.ExpressionAndPlaceholders;
 import com.m12i.minque.Operator;
 
 public class ExpressionParserTest {
@@ -18,9 +19,9 @@ public class ExpressionParserTest {
 	
 	private static Expression parse(String expr) {
 		final Reader in = Readers.createReader(expr);
-		final Result<Expression> r = parser.parse(in);
+		final Result<ExpressionAndPlaceholders> r = parser.parse(in);
 		if (r.failed) r.throwsError(in);
-		return r.value;
+		return r.value.expression;
 	}
 	
 	@Test
