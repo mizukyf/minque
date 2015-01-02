@@ -80,6 +80,7 @@ final int result2 = query2.countFrom(target, "baz");
 `*=` は左辺で指定されたプロパティが右辺で指定された値を含むことを（中間一致）、
 `$=` は左辺で指定されたプロパティが右辺で指定された値で終わることを（後方一致）それぞれ表します。
 単項演算子の `is null` と `is not null` はこれもご想像通りの動作をするはずです。
+大小比較のための`<`・`<=`・`>`・`>=`は左辺と右辺が`java.lang.String`もしくは`java.lang.Number`のサブクラスである場合にのみ有効です。
 
 ```bnf
 <query> ::= <expression>
