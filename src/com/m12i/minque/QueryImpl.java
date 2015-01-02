@@ -42,6 +42,32 @@ final class QueryImpl<E> implements Query<E> {
 	}
 
 	@Override
+	public int countFrom(Iterable<E> source) {
+		if (hasPlaceholders) {
+			throw new IllegalArgumentException("Bind variables is required for this query.");
+		}
+		int result = 0;
+		for (final E elem : source) {
+			if (evaluate(expression, elem)) {
+				result ++;
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public int countFrom(Iterable<E> source, Object... vars) {
+		ph.bind(vars);
+		int result = 0;
+		for (final E elem : source) {
+			if (evaluate(expression, elem)) {
+				result ++;
+			}
+		}
+		return result;
+	}
+
+	@Override
 	public E selectOneFrom(Iterable<E> source) {
 		if (hasPlaceholders) {
 			throw new IllegalArgumentException("Bind variables is required for this query.");
