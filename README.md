@@ -15,16 +15,16 @@ final QueryFactory factory = QueryFactory.createBeanQueryFactory(Person.class);
 // firstNameプロパティを条件に検索するクエリを作成
 final Query query0 = factory.create("firstName == 'foo'");
 // 条件にマッチするものすべてを取得
-final List<Persion> result0 = query0.selectFrom(target);
+final List<Person> result0 = query0.selectFrom(target);
 
 // firstNameが'f'ではじまり'o'で終わるかlastNameが"bar"である要素を検索するクエリを作成
-final Query query1 = factory.create("(firstName ^= 'f' and firstName =$ 'o') or lastName == 'bar'");
+final Query query1 = factory.create("(firstName ^= 'f' and firstName $= 'o') or lastName == 'bar'");
 // 条件にマッチする1件だけを取得
-final Persion result0 = query1.selectOneFrom(target);
+final Person result1 = query1.selectOneFrom(target);
 
 // firstNameがバインド変数で指定された値である要素を検索するクエリを作成
-final Query query1 = factory.create("firstName == ?");
-final int result2 = query0.countFrom(target, "baz");
+final Query query2 = factory.create("firstName == ?");
+final int result2 = query2.countFrom(target, "baz");
 ```
 
 ### QueryFactory
@@ -80,6 +80,7 @@ final int result2 = query0.countFrom(target, "baz");
 `*=` は左辺で指定されたプロパティが右辺で指定された値を含むことを（中間一致）、
 `$=` は左辺で指定されたプロパティが右辺で指定された値で終わることを（後方一致）それぞれ表します。
 単項演算子の `is null` と `is not null` はこれもご想像通りの動作をするはずです。
+大小比較のための`<`・`<=`・`>`・`>=`は左辺と右辺が`java.lang.String`もしくは`java.lang.Number`のサブクラスである場合にのみ有効です。
 
 ```bnf
 <query> ::= <expression>
@@ -105,6 +106,10 @@ final int result2 = query0.countFrom(target, "baz");
 	| "^="
 	| "*="
 	| "$="
+	| "<"
+	| "<="
+	| ">"
+	| ">="
 
 <property> ::= '"' string '"'
 	| "'" string "'"
