@@ -20,11 +20,11 @@ final List<Person> result0 = query0.selectFrom(target);
 // firstNameが'f'ではじまり'o'で終わるかlastNameが"bar"である要素を検索するクエリを作成
 final Query query1 = factory.create("(firstName ^= 'f' and firstName =$ 'o') or lastName == 'bar'");
 // 条件にマッチする1件だけを取得
-final Person result0 = query1.selectOneFrom(target);
+final Person result1 = query1.selectOneFrom(target);
 
 // firstNameがバインド変数で指定された値である要素を検索するクエリを作成
-final Query query1 = factory.create("firstName == ?");
-final int result2 = query0.countFrom(target, "baz");
+final Query query2 = factory.create("firstName == ?");
+final int result2 = query2.countFrom(target, "baz");
 ```
 
 ### QueryFactory
