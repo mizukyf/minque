@@ -105,6 +105,10 @@ final int result2 = query2.countFrom(target, "baz");
 	| "^="
 	| "*="
 	| "$="
+	| "<"
+	| "<="
+	| ">"
+	| ">="
 
 <property> ::= '"' string '"'
 	| "'" string "'"
