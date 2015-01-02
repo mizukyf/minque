@@ -152,4 +152,14 @@ public class QueryTest {
 		final List<HashMap<String, String>> res1 = q0.selectFrom(list1, "hello");
 		assertThat(res1.size(), is(1));
 	}
+
+	@Test
+	public void countTest00() {
+		final Query<HashMap<String, String>> q0 = create("key0 == ?");
+		final int res0 = q0.countFrom(list1, "foo");
+		assertThat(res0, is(2));
+		
+		final int res1 = q0.countFrom(list1, "hello");
+		assertThat(res1, is(1));
+	}
 }
