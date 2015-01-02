@@ -1,4 +1,4 @@
-package com.m12i.query.parse;
+package com.m12i.minque;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -10,9 +10,9 @@ import java.util.List;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.m12i.query.parse.Accessor;
-import com.m12i.query.parse.Query;
-import com.m12i.query.parse.QueryFactory;
+import com.m12i.minque.Accessor;
+import com.m12i.minque.Query;
+import com.m12i.minque.QueryFactory;
 
 public class QueryTest {
 

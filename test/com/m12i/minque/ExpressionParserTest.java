@@ -1,4 +1,4 @@
-package com.m12i.query.parse;
+package com.m12i.minque;
 
 import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -8,9 +8,9 @@ import org.junit.Test;
 import com.m12i.code.parse.Reader;
 import com.m12i.code.parse.Readers;
 import com.m12i.code.parse.Result;
-import com.m12i.query.parse.Expression;
-import com.m12i.query.parse.ExpressionParser;
-import com.m12i.query.parse.Operator;
+import com.m12i.minque.Expression;
+import com.m12i.minque.ExpressionParser;
+import com.m12i.minque.Operator;
 
 public class ExpressionParserTest {
 

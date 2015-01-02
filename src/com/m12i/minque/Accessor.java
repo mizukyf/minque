@@ -1,4 +1,4 @@
-package com.m12i.query.parse;
+package com.m12i.minque;
 
 /**
  * クエリの条件式で指定されたプロパティを要素から取得するためのアクセサ.

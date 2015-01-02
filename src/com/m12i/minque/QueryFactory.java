@@ -1,4 +1,4 @@
-package com.m12i.query.parse;
+package com.m12i.minque;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;

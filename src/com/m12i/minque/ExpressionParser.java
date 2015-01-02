@@ -1,4 +1,4 @@
-package com.m12i.query.parse;
+package com.m12i.minque;
 
 import com.m12i.code.parse.AbstractParser;
 import com.m12i.code.parse.ParseError;

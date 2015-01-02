@@ -1,4 +1,4 @@
-package com.m12i.query.parse;
+package com.m12i.minque;
 
 import java.util.ArrayList;
 import java.util.Collection;
