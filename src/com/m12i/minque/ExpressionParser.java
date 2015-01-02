@@ -236,6 +236,22 @@ final class ExpressionParser extends AbstractParser<ExpressionParser.ExpressionA
 			in.next();
 			return Operator.CONTAINS;
 			
+		} else if (c0 == '<') {
+			final char c = in.next();
+			if (c == '=') {
+				in.next();
+				return Operator.LESS_THAN_EQUAL;
+			} else {
+				return Operator.LESS_THAN;
+			}
+		} else if (c0 == '>') {
+			final char c = in.next();
+			if (c == '=') {
+				in.next();
+				return Operator.GREATER_THAN_EQUAL;
+			} else {
+				return Operator.GREATER_THAN;
+			}
 		} else if (c0 == 'i') {
 			parsers.skipWord(in, "is");
 			in.next();

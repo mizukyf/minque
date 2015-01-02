@@ -91,28 +91,75 @@ final class QueryImpl<E> implements Query<E> {
 		return null;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private boolean evaluate(Expression expr, E elem) {
 		if (expr.isComparative()) {
-			final String actual = accessor.accsess(elem, expr.getProperty());
+			final Object actual = accessor.accsess(elem, expr.getProperty());
 			final Operator op = expr.getOperator();
 			final String expected = expr.getValue();
 			if (op == Operator.IS_NOT_NULL) {
 				return actual != null;
 			} else if (op == Operator.IS_NULL) {
 				return actual == null;
-			} else if (op == Operator.CONTAINS) {
-				return actual.contains(expected);
-			} else if (op == Operator.ENDS_WITH) {
-				return actual.endsWith(expected);
-			} else if (op == Operator.EQUALS) {
-				return expected.equals(actual);
-			} else if (op == Operator.NOT_EQUALS) {
-				return !expected.equals(actual);
-			} else if (op == Operator.STARTS_WITH) {
-				return actual.startsWith(expected);
-			} else {
-				throw new RuntimeException("Unsupported comparative expression.");
+			} else if (actual != null) {
+				if (op == Operator.CONTAINS) {
+					return actual.toString().contains(expected);
+				} else if (op == Operator.ENDS_WITH) {
+					return actual.toString().endsWith(expected);
+				} else if (op == Operator.EQUALS) {
+					return expected.equals(actual.toString());
+				} else if (op == Operator.NOT_EQUALS) {
+					return !expected.equals(actual.toString());
+				} else if (op == Operator.STARTS_WITH) {
+					return actual.toString().startsWith(expected);
+				} else if (actual instanceof Comparable) {
+					try {
+						final Comparable c0;
+						final Comparable c1;
+
+						if (actual instanceof Integer) {
+							c0 = (Integer) actual;
+							c1 = Integer.valueOf(expected);
+						} else if (actual instanceof Long) {
+							c0 = (Long) actual;
+							c1 = Long.valueOf(expected);
+						} else if (actual instanceof Float) {
+							c0 = (Float) actual;
+							c1 = Float.valueOf(expected);
+						} else if (actual instanceof Double) {
+							c0 = (Double) actual;
+							c1 = Double.valueOf(expected);
+						} else if (actual instanceof Short) {
+							c0 = (Short) actual;
+							c1 = Short.valueOf(expected);
+						} else if (actual instanceof Byte) {
+							c0 = (Byte) actual;
+							c1 = Byte.valueOf(expected);
+						} else if (actual instanceof Character && expected.length() == 1) {
+							c0 = (Character) actual;
+							c1 = expected.charAt(0);
+						} else if (actual instanceof String) {
+							c0 = actual.toString();
+							c1 = expected;
+						} else {
+							return false;
+						}
+						
+						if (op == Operator.LESS_THAN) {
+							return c0.compareTo(c1) < 0;
+						} else if (op == Operator.LESS_THAN_EQUAL) {
+							return c0.compareTo(c1) <= 0;
+						} else if (op == Operator.GREATER_THAN) {
+							return c0.compareTo(c1) > 0;
+						} else if (op == Operator.GREATER_THAN_EQUAL) {
+							return c0.compareTo(c1) >= 0;
+						}
+					} catch (final NumberFormatException e) {
+						// Do nothing.
+					}
+				}
 			}
+			return false;
 		} else {
 			final Operator op = expr.getOperator();
 			if (! expr.hasLeft()) {

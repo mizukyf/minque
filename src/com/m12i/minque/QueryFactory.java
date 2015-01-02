@@ -18,8 +18,8 @@ public final class QueryFactory<E> {
 	public static QueryFactory<Map<String, Object>> createMapQueryFactory() { 
 		return new QueryFactory<Map<String,Object>>(new Accessor<Map<String, Object>>() {
 				@Override
-				public String accsess(Map<String, Object> elem, String prop) {
-					return elem.containsKey(prop) ? elem.get(prop).toString() : null;
+				public Object accsess(Map<String, Object> elem, String prop) {
+					return elem.containsKey(prop) ? elem.get(prop) : null;
 				}
 			});
 	}
@@ -65,7 +65,7 @@ public final class QueryFactory<E> {
 				}
 			}
 			@Override
-			public String accsess(T elem, String prop) {
+			public Object accsess(T elem, String prop) {
 				try {
 					// プロパティ名にマッチするgetterメソッドを探す
 					final Method m = getGetter(prop);
@@ -76,7 +76,7 @@ public final class QueryFactory<E> {
 					// 再びnullチェックを実施
 					if (o == null) return null;
 					// getterの呼び出し結果を文字列化して返す
-					return o.toString();
+					return o;
 				} catch (Exception e) {
 					// 何らかの理由でメソッドコールが失敗したらともかくnullを返す
 					return null;

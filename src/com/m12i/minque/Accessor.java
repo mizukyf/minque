@@ -13,5 +13,5 @@ public interface Accessor<E> {
 	 * @param prop 対象のプロパティ
 	 * @return 取得結果
 	 */
-	String accsess(E elem, String prop);
+	Object accsess(E elem, String prop);
 }

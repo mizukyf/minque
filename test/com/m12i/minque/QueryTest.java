@@ -162,4 +162,50 @@ public class QueryTest {
 		final int res1 = q0.countFrom(list1, "hello");
 		assertThat(res1, is(1));
 	}
+	
+	public static final class Person {
+		private final int age;
+		private final String firstName;
+		private final String lastName;
+		public Person(final String firstName, final String lastName, final int age) {
+			this.age = age;
+			this.firstName = firstName;
+			this.lastName = lastName;
+		}
+		public int getAge() {
+			return age;
+		}
+		public String getFirstName() {
+			return firstName;
+		}
+		public String getLastName() {
+			return lastName;
+		}
+	}
+	
+	public static final QueryFactory<Person> personQueryFactory =
+			QueryFactory.createBeanQueryFactory(Person.class);
+	
+	@Test
+	public void selectFromTest40() throws QueryParseException {
+		final List<Person> list = new ArrayList<Person>();
+		list.add(new Person("foo", "bar", 20));
+		list.add(new Person("foo", "baz", 40));
+		list.add(new Person("far", "boo", 60));
+		
+		final Query<Person> ageQuery = personQueryFactory.create("age < ?");
+		assertThat(ageQuery.countFrom(list, "foo"), is(0));
+		assertThat(ageQuery.countFrom(list, "20"), is(0));
+		assertThat(ageQuery.countFrom(list, 20), is(0));
+		assertThat(ageQuery.countFrom(list, 21), is(1));
+		assertThat(ageQuery.countFrom(list, "21"), is(1));
+		assertThat(ageQuery.countFrom(list, 40), is(1));
+		assertThat(ageQuery.countFrom(list, 41), is(2));
+		
+		final Query<Person> firstNameQuery = personQueryFactory.create("firstName > ?");
+		assertThat(firstNameQuery.countFrom(list, "foo"), is(0));
+		assertThat(firstNameQuery.countFrom(list, "fop"), is(0));
+		assertThat(firstNameQuery.countFrom(list, "fas"), is(2));
+		assertThat(firstNameQuery.countFrom(list, "fa"), is(3));
+	}
 }
