@@ -33,67 +33,34 @@ final int result2 = query0.countFrom(target, "baz");
 このオブジェクトにはあらかじめ2つの実装が用意されています。
 
 1つは`MapQueryFactory`で`Map<String,Object>`のコレクションを検索するためのもの、
-もう1つは`BeanQueryFactory`で任意のオブジェクトからなるコレクションを検索するためのものです。
+もう1つは`BeanQueryFactory`でJava Beansプロパティを持つオブジェクトのコレクションを検索するためのものです。
+加えて後述の`Accessor`インターフェースを実装することで任意のオブジェクトを検索対象とすることもできます。
 
 ### Query
 
 解析済みクエリを表わすオブジェクトです。コレクション要素を検索するためのAPIを提供します。
-ファクトリのAPIによって解析されたコードは、Query内部にJavaオブジェクト・グラフとして格納され、コレクションの要素を検索する時に使用されます。
+ファクトリによって解析されたコードは、`Query`内部にJavaオブジェクト・グラフとして格納され、コレクションの要素を検索する時に使用されます。
 
 ### Accessor
 
 クエリの条件式で指定されたプロパティを要素から取得するためのアクセサのインターフェースです。
-このインターフェースの実装オブジェクトをパラメータとしてQueryFactoryは初期化されます。
+このインターフェースの実装オブジェクトをパラメータとして`QueryFactory`を初期化することができます。
 
 ### 検索対象コレクションとAccessorオブジェクト
 
-Accessorインターフェースは、MinqueのAPIが提供する機能の抽象化のかなめです。
+`Accessor`インターフェースは、MinqueのAPIが提供する機能の抽象化のかなめです。
 このインターフェースを適切に実装することで、ライブラリのユーザはさまざまなコレクションを検索対象とするクエリを作成できます。
 
-QueryFactoryには定義済みのAccessor実装で初期化されたインスタンスも用意されています。
+前述のとおり`QueryFactory`には定義済みの`Accessor`実装で初期化されたインスタンスも用意されています。
 例えば、`QueryFactory.createMapQueryFactory()`が返すファクトリ・インスタンスは、
-Map<String, Object>を処理するAccessorで初期化されています。
+`Map<String,Object>`を処理する`Accessor`で初期化されています。
 
 また、`QueryFactory.createBeanQueryFactory(Class)`が返すインスタンスは、
-リフレクションによりプロパティにアクセスする汎用的なAccessorで初期化されています。
-このファクトリから生成されるクエリではプロパティ（比較式の左辺）はそのままJavaBeansのプロパティに対応します。
+リフレクションによりプロパティにアクセスする汎用的な`Accessor`で初期化されています。
+このファクトリから生成されるクエリではプロパティ（比較式の左辺）はそのままJava Beansプロパティに対応します。
 したがって`"foo == 1"`というクエリは、`getFoo()`（もしくは`foo()`）が`"1"`を返すBeanにマッチします。
-BeanQueryFactoryのユーザはリフレクションに伴うパフォーマンス上のコストを支払うのと引き換えに、
-いちいちAccessorを実装することから生じる面倒──開発・保守上のコストやリスクから開放されます。
-
-## 使用方法
-
-```java
-package minque.usage;
-
-import com.m12i.minque.Query;
-import com.m12i.minque.QueryFactory;
-
-...
-
-public class Main {
-  
-	public static void main(String... args) throws QueryParseException {
-    
-    // Map<String, Object>を要素とするコレクションがあると仮定します
-    final List<Map<String, Object> list0 = ...;
-
-    // createMapQueryFactory()はCollection<Map<String, Object>>から
-    // 条件にマッチする要素を検索するクエリのためのファクトリ実装を返します
-		final QueryFactory<Map<String, Object>> factory = QueryFactory
-				.createMapQueryFactory();
-		
-		// 文字列で表現されたクエリをパースして解析済みクエリを作成します
-		final Query<Map<String, Object>> query = factory
-		    .create("prop0 == foo and prop1 == bar");
-
-    // コレクションに対する検索を実施します
-		q.selectFrom(list0); // => List<Map<String, Object>>
-		
-  }
-
-}
-```
+`BeanQueryFactory`のユーザはリフレクションに伴うパフォーマンス上のコストを支払うのと引き換えに、
+いちいち`Accessor`を実装することから生じる面倒──開発・保守上のコストやリスクから開放されます。
 
 ## クエリの構文
 
