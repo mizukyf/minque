@@ -1,9 +1,8 @@
-# Query-parse
+# Minque
 
 ## プロジェクトの概要
 
-Query-codeは比較演算子と論理演算子からなるクエリを処理するライブラリです。
-クエリ文字列をパースするロジックは[Code-parse](https://github.com/mizukyf/code-parse)プロジェクトの成果物に依存しています。
+Minqueは比較演算子と論理演算子からなるクエリを処理するライブラリです。
 
 ### QueryFactory
 
@@ -38,13 +37,11 @@ BeanQueryFactoryのユーザはリフレクションに伴うパフォーマン�
 
 ## 使用方法
 
-Code-parseのjarのjarをプロジェクトのビルドパスに設定します。あとはQueryFactoryを初期化して、それを使ってQueryを作成、任意のコレクションに対して問合せを行います：
-
 ```java
-package code.parse.usage;
+package minque.usage;
 
-import com.m12i.query.parse.Query;
-import com.m12i.query.parse.QueryFactory;
+import com.m12i.minque.Query;
+import com.m12i.minque.QueryFactory;
 
 ...
 
@@ -65,7 +62,7 @@ public class Main {
 		    .create("prop0 == foo and prop1 == bar");
 
     // コレクションに対する検索を実施します
-		q.selectAllFrom(list0); // => List<Map<String, Object>>
+		q.selectFrom(list0); // => List<Map<String, Object>>
 		
   }
 
