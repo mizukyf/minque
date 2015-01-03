@@ -76,6 +76,11 @@ final class ExpressionParser extends AbstractParser<ExpressionParser.ExpressionA
 			parsers.skipWhitespace(in);
 			// 次に演算子をパースする
 			final Operator op = parseComparativeOperator(in);
+			// 演算子が見つからなかった場合boolean型のプロパティとみなして式を補う
+			if (op == null) {
+				return Expression.comparative(Expression.property(prop), Operator.EQUALS, Expression.value("true"));
+			}
+			
 			// 空白文字をスキップ
 			parsers.skipWhitespace(in);
 			// 演算子の種類をチェックして値の記述をパースする
