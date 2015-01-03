@@ -99,72 +99,15 @@ final class QueryImpl<E> implements Query<E> {
 			final Object actual = accessor.accsess(elem, expr.getProperty());
 			final Operator op = expr.getOperator();
 			final String expected = expr.getValue();
-			if (op == Operator.IS_NOT_NULL) {
-				return actual != null;
-			} else if (op == Operator.IS_NULL) {
-				return actual == null;
+			
+			if (op.forNullable) {
+				return nullable(actual, op);
 			} else if (actual != null) {
-				if (op == Operator.CONTAINS) {
-					return actual.toString().contains(expected);
-				} else if (op == Operator.ENDS_WITH) {
-					return actual.toString().endsWith(expected);
-				} else if (op == Operator.EQUALS) {
-					return expected.equals(actual.toString());
-				} else if (op == Operator.NOT_EQUALS) {
-					return !expected.equals(actual.toString());
-				} else if (op == Operator.STARTS_WITH) {
-					return actual.toString().startsWith(expected);
-				} else if (actual instanceof Comparable) {
-					try {
-						final Comparable c0;
-						final Comparable c1;
-
-						if (actual instanceof Integer) {
-							c0 = (Integer) actual;
-							c1 = Integer.valueOf(expected);
-						} else if (actual instanceof Long) {
-							c0 = (Long) actual;
-							c1 = Long.valueOf(expected);
-						} else if (actual instanceof Float) {
-							c0 = (Float) actual;
-							c1 = Float.valueOf(expected);
-						} else if (actual instanceof Double) {
-							c0 = (Double) actual;
-							c1 = Double.valueOf(expected);
-						} else if (actual instanceof Short) {
-							c0 = (Short) actual;
-							c1 = Short.valueOf(expected);
-						} else if (actual instanceof Byte) {
-							c0 = (Byte) actual;
-							c1 = Byte.valueOf(expected);
-						} else if (actual instanceof Character && expected.length() == 1) {
-							c0 = (Character) actual;
-							c1 = expected.charAt(0);
-						} else if (actual instanceof BigDecimal) {
-							c0 = (BigDecimal) actual;
-							c1 = new BigDecimal(expected);
-						} else if (actual instanceof BigInteger) {
-							c0 = (BigInteger) actual;
-							c1 = new BigInteger(expected);
-						} else if (actual instanceof String) {
-							c0 = actual.toString();
-							c1 = expected;
-						} else {
-							return false;
-						}
-						
-						if (op == Operator.LESS_THAN) {
-							return c0.compareTo(c1) < 0;
-						} else if (op == Operator.LESS_THAN_EQUAL) {
-							return c0.compareTo(c1) <= 0;
-						} else if (op == Operator.GREATER_THAN) {
-							return c0.compareTo(c1) > 0;
-						} else if (op == Operator.GREATER_THAN_EQUAL) {
-							return c0.compareTo(c1) >= 0;
-						}
-					} catch (final NumberFormatException e) {
-						// Do nothing.
-					}
+				if (op.forString) {
+					return string(actual, expected, op);
+				} else if (op.forOrdered) {
+					final Comparable[] pair = makeComparablePair(actual, expected);
+					return pair[1] != null && ordered(pair[0], pair[1], op);
 				}
 			}
 			return false;
@@ -189,4 +132,86 @@ final class QueryImpl<E> implements Query<E> {
 		}
 	}
 	
+	private boolean string(final Object actual, final String expected, final Operator op) {
+		final String s = actual.toString();
+		if (op == Operator.CONTAINS) {
+			return s.contains(expected);
+		} else if (op == Operator.ENDS_WITH) {
+			return s.endsWith(expected);
+		} else if (op == Operator.EQUALS) {
+			return expected.equals(s);
+		} else if (op == Operator.NOT_EQUALS) {
+			return !expected.equals(s);
+		} else if (op == Operator.STARTS_WITH) {
+			return s.startsWith(expected);
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	private boolean nullable(final Object actual, final Operator op) {
+		if (op == Operator.IS_NULL) {
+			return actual == null;
+		} else if (op == Operator.IS_NULL) {
+			return actual != null;
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private boolean ordered(final Comparable actual, final Comparable expected, final Operator op) {
+		if (op == Operator.LESS_THAN) {
+			return actual.compareTo(expected) < 0;
+		} else if (op == Operator.LESS_THAN_EQUAL) {
+			return actual.compareTo(expected) <= 0;
+		} else if (op == Operator.GREATER_THAN) {
+			return actual.compareTo(expected) > 0;
+		} else if (op == Operator.GREATER_THAN_EQUAL) {
+			return actual.compareTo(expected) >= 0;
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private Comparable[] makeComparablePair(Object actual, String expected) {
+		final Comparable[] result = new Comparable[2];
+		try {
+			if (actual instanceof Integer) {
+				result[0] = (Integer) actual;
+				result[1] = Integer.valueOf(expected);
+			} else if (actual instanceof Long) {
+				result[0] = (Long) actual;
+				result[1] = Long.valueOf(expected);
+			} else if (actual instanceof Float) {
+				result[0] = (Float) actual;
+				result[1] = Float.valueOf(expected);
+			} else if (actual instanceof Double) {
+				result[0] = (Double) actual;
+				result[1] = Double.valueOf(expected);
+			} else if (actual instanceof Short) {
+				result[0] = (Short) actual;
+				result[1] = Short.valueOf(expected);
+			} else if (actual instanceof Byte) {
+				result[0] = (Byte) actual;
+				result[1] = Byte.valueOf(expected);
+			} else if (actual instanceof Character && expected.length() == 1) {
+				result[0] = (Character) actual;
+				result[1] = expected.charAt(0);
+			} else if (actual instanceof BigDecimal) {
+				result[0] = (BigDecimal) actual;
+				result[1] = new BigDecimal(expected);
+			} else if (actual instanceof BigInteger) {
+				result[0] = (BigInteger) actual;
+				result[1] = new BigInteger(expected);
+			} else if (actual instanceof String) {
+				result[0] = actual.toString();
+				result[1] = expected;
+			}
+		} catch (final NumberFormatException e) {
+			// Do nothing.
+		}
+		return result;
+	}	
 }
