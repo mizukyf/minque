@@ -153,6 +153,9 @@ public class QueryTest {
 		
 		final List<HashMap<String, String>> res1 = q0.selectFrom(list1, "hello");
 		assertThat(res1.size(), is(1));
+
+		final Query<HashMap<String, String>> q1 = create("key0 == ? or key1 == ?");
+		assertThat(q1.selectFrom(list1, "foo", "world").size(), is(3));
 	}
 
 	@Test
@@ -220,5 +223,34 @@ public class QueryTest {
 		final Query<Person> birthDateQuery = personQueryFactory.create("birthDate < ?");
 		assertThat(birthDateQuery.countFrom(list, "foo"), is(0));
 		assertThat(birthDateQuery.countFrom(list, new Date()), is(3));
+	}
+	
+	public static final class TrueOrFalse {
+		private final boolean value;
+		public TrueOrFalse(final boolean value) {
+			this.value = value;
+		}
+		public boolean getValue() {
+			return value;
+		}
+	}
+	
+	@Test
+	public void selectFromTest50() throws QueryParseException {
+		final List<TrueOrFalse> list = new ArrayList<TrueOrFalse>();
+		list.add(new TrueOrFalse(true));
+		list.add(new TrueOrFalse(true));
+		list.add(new TrueOrFalse(false));
+		final QueryFactory<TrueOrFalse> factory = QueryFactory.createBeanQueryFactory(TrueOrFalse.class);
+		final Query<TrueOrFalse> query0 = factory.create("value");
+		final Query<TrueOrFalse> query1 = factory.create("(value)");
+		final Query<TrueOrFalse> query2 = factory.create("!value");
+		final Query<TrueOrFalse> query3 = factory.create("value == ?");
+		
+		assertThat(query0.selectFrom(list).size(), is(2));
+		assertThat(query1.selectFrom(list).size(), is(2));
+		assertThat(query2.selectFrom(list).size(), is(1));
+		assertThat(query3.selectFrom(list, true).size(), is(2));
+		assertThat(query3.selectFrom(list, false).size(), is(1));
 	}
 }
