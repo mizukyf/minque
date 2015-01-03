@@ -205,74 +205,41 @@ final class ExpressionParser extends AbstractParser<ExpressionParser.ExpressionA
 	 * @throws InputExeption 入力データ読み取り中にエラーが発生した場合
 	 */
 	private Operator parseComparativeOperator(final Input in) throws InputExeption {
-		final char c0 = in.current();
-		
-		if (c0 == '=') {
-			parsers.checkNext(in, '=');
-			in.next();
+		if (forwardIfRestStartsWithOprator(in, "==")) {
 			return Operator.EQUALS;
-			
-		} else if (c0 == '!') {
-			parsers.checkNext(in, '=');
-			in.next();
+		} else if (forwardIfRestStartsWithOprator(in, "!=")) {
 			return Operator.NOT_EQUALS;
-			
-		} else if (c0 == '^') {
-			parsers.checkNext(in, '=');
-			in.next();
+		} else if (forwardIfRestStartsWithOprator(in, "^=")) {
 			return Operator.STARTS_WITH;
-			
-		} else if (c0 == '$') {
-			parsers.checkNext(in, '=');
-			in.next();
-			return Operator.ENDS_WITH;
-			
-		} else if (c0 == '*') {
-			parsers.checkNext(in, '=');
-			in.next();
+		} else if (forwardIfRestStartsWithOprator(in, "*=")) {
 			return Operator.CONTAINS;
-			
-		} else if (c0 == '<') {
-			final char c = in.next();
-			if (c == '=') {
-				in.next();
-				return Operator.LESS_THAN_EQUAL;
-			} else {
-				return Operator.LESS_THAN;
-			}
-		} else if (c0 == '>') {
-			final char c = in.next();
-			if (c == '=') {
-				in.next();
-				return Operator.GREATER_THAN_EQUAL;
-			} else {
-				return Operator.GREATER_THAN;
-			}
-		} else if (c0 == 'i') {
-			parsers.skipWord(in, "is");
-			in.next();
-			parsers.skipWhitespace(in);
-			parsers.check(in, 'n');
-			
-			final char c1 = in.next();
-			if (c1 == 'o') {
-				parsers.checkNext(in, 't');
-				in.next();
-				parsers.skipWhitespace(in);
-				parsers.check(in, 'n');
-				parsers.checkNext(in, 'u');
-				parsers.checkNext(in, 'l');
-				parsers.checkNext(in, 'l');
-				in.next();
-				return Operator.IS_NOT_NULL;
-			} else if (c1 == 'u') {
-				parsers.checkNext(in, 'l');
-				parsers.checkNext(in, 'l');
-				in.next();
-				return Operator.IS_NULL;
-			}
-			
+		} else if (forwardIfRestStartsWithOprator(in, "$=")) {
+			return Operator.ENDS_WITH;
+		} else if (forwardIfRestStartsWithOprator(in, "<")) {
+			return Operator.LESS_THAN;
+		} else if (forwardIfRestStartsWithOprator(in, "<=")) {
+			return Operator.LESS_THAN_EQUAL;
+		} else if (forwardIfRestStartsWithOprator(in, ">")) {
+			return Operator.GREATER_THAN;
+		} else if (forwardIfRestStartsWithOprator(in, ">=")) {
+			return Operator.GREATER_THAN_EQUAL;
+		} else if (forwardIfRestStartsWithOprator(in, "is null")) {
+			return Operator.IS_NULL;
+		} else if (forwardIfRestStartsWithOprator(in, "is not null")) {
+			return Operator.IS_NOT_NULL;
+		} else {
+			return null;
 		}
-		throw new ParseException("Invalid syntax found on comparative expression.", in);
+	}
+	
+	private boolean forwardIfRestStartsWithOprator(final Input in, final String op) throws InputExeption {
+		if (in.restStartsWith(op)) {
+			for (int i = 0; i < op.length(); i ++) {
+				in.next();
+			}
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
