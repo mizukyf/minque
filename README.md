@@ -24,7 +24,7 @@ final Person result1 = query1.selectOneFrom(target);
 
 // firstNameがバインド変数で指定された値である要素を検索するクエリを作成
 final Query query2 = factory.create("firstName == ?");
-final int result2 = query2.countFrom(target, "baz");
+final int result2 = query2.countIn(target, "baz");
 ```
 
 ### QueryFactory
