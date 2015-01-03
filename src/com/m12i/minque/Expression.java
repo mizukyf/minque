@@ -2,7 +2,7 @@ package com.m12i.minque;
 
 final class Expression {
 	private final String prop;
-	private String value;
+	private Object value;
 	private final Expression left;
 	private final Operator op;
 	private final Expression right;
@@ -54,10 +54,10 @@ final class Expression {
 	public String getProperty() {
 		return isComparative() ? getLeft().getProperty() : prop;
 	}
-	public String getValue() {
+	public Object getValue() {
 		return isComparative() ? getRight().getValue() : value;
 	}
-	public void setValue(final String value) {
+	public void setValue(final Object value) {
 		if (isValue()) {
 			if (value == null) throw new RuntimeException("Value must not be null.");
 			this.value = value;

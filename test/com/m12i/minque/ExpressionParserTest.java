@@ -50,7 +50,7 @@ public class ExpressionParserTest {
 		assertTrue(expr.hasRight());
 		assertThat(expr.getProperty(), is("a"));
 		assertThat(expr.getOperator(), is(Operator.EQUALS));
-		assertThat(expr.getValue(), is("1"));
+		assertThat(expr.getValue().toString(), is("1"));
 	}
 	
 	@Test
@@ -59,7 +59,7 @@ public class ExpressionParserTest {
 		assertTrue(expr.isComparative());
 		assertThat(expr.getProperty(), is("a"));
 		assertThat(expr.getOperator(), is(Operator.NOT_EQUALS));
-		assertThat(expr.getValue(), is("1"));
+		assertThat(expr.getValue().toString(), is("1"));
 	}
 	
 	@Test
@@ -68,7 +68,7 @@ public class ExpressionParserTest {
 		assertTrue(expr.isComparative());
 		assertThat(expr.getProperty(), is("a"));
 		assertThat(expr.getOperator(), is(Operator.STARTS_WITH));
-		assertThat(expr.getValue(), is("1"));
+		assertThat(expr.getValue().toString(), is("1"));
 	}
 	
 	@Test
@@ -77,7 +77,7 @@ public class ExpressionParserTest {
 		assertTrue(expr.isComparative());
 		assertThat(expr.getProperty(), is("a"));
 		assertThat(expr.getOperator(), is(Operator.ENDS_WITH));
-		assertThat(expr.getValue(), is("1"));
+		assertThat(expr.getValue().toString(), is("1"));
 	}
 
 	@Test
@@ -86,7 +86,7 @@ public class ExpressionParserTest {
 		assertTrue(expr.isComparative());
 		assertThat(expr.getProperty(), is("a"));
 		assertThat(expr.getOperator(), is(Operator.CONTAINS));
-		assertThat(expr.getValue(), is("1"));
+		assertThat(expr.getValue().toString(), is("1"));
 	}
 
 	@Test
@@ -111,19 +111,19 @@ public class ExpressionParserTest {
 	public void parseTest08() {
 		final Expression expr0 = parse("a_0 == hello_world");
 		assertThat(expr0.getProperty(), is("a_0"));
-		assertThat(expr0.getValue(), is("hello_world"));
+		assertThat(expr0.getValue().toString(), is("hello_world"));
 		final Expression expr1 = parse("a-1 == hello-world");
 		assertThat(expr1.getProperty(), is("a-1"));
-		assertThat(expr1.getValue(), is("hello-world"));
+		assertThat(expr1.getValue().toString(), is("hello-world"));
 		final Expression expr2 = parse("\"a 2\" == \"hello world\"");
 		assertThat(expr2.getProperty(), is("a 2"));
-		assertThat(expr2.getValue(), is("hello world"));
+		assertThat(expr2.getValue().toString(), is("hello world"));
 		final Expression expr3 = parse("'a 3' == 'hello world'");
 		assertThat(expr3.getProperty(), is("a 3"));
-		assertThat(expr3.getValue(), is("hello world"));
+		assertThat(expr3.getValue().toString(), is("hello world"));
 		final Expression expr4 = parse("'a\\' 4' == 'hello world\\''");
 		assertThat(expr4.getProperty(), is("a' 4"));
-		assertThat(expr4.getValue(), is("hello world'"));
+		assertThat(expr4.getValue().toString(), is("hello world'"));
 	}
 	
 	@Test
@@ -136,7 +136,7 @@ public class ExpressionParserTest {
 		assertTrue(expr.getRight().isComparative());
 		assertThat(expr.getRight().getProperty(), is("a"));
 		assertThat(expr.getRight().getOperator(), is(Operator.EQUALS));
-		assertThat(expr.getRight().getValue(), is("1"));
+		assertThat(expr.getRight().getValue().toString(), is("1"));
 	}
 	
 	@Test
@@ -149,7 +149,7 @@ public class ExpressionParserTest {
 		assertTrue(expr.getRight().isComparative());
 		assertThat(expr.getRight().getProperty(), is("b"));
 		assertThat(expr.getRight().getOperator(), is(Operator.NOT_EQUALS));
-		assertThat(expr.getRight().getValue(), is("2"));
+		assertThat(expr.getRight().getValue().toString(), is("2"));
 	}
 	
 	@Test
@@ -162,7 +162,7 @@ public class ExpressionParserTest {
 		assertTrue(expr.getRight().isComparative());
 		assertThat(expr.getRight().getProperty(), is("b"));
 		assertThat(expr.getRight().getOperator(), is(Operator.NOT_EQUALS));
-		assertThat(expr.getRight().getValue(), is("2"));
+		assertThat(expr.getRight().getValue().toString(), is("2"));
 	}
 	
 	@Test
@@ -175,7 +175,7 @@ public class ExpressionParserTest {
 		assertTrue(expr.getRight().isComparative());
 		assertThat(expr.getRight().getProperty(), is("b"));
 		assertThat(expr.getRight().getOperator(), is(Operator.NOT_EQUALS));
-		assertThat(expr.getRight().getValue(), is("2"));
+		assertThat(expr.getRight().getValue().toString(), is("2"));
 	}
 	
 	@Test
@@ -188,7 +188,7 @@ public class ExpressionParserTest {
 		assertTrue(expr.getRight().isComparative());
 		assertThat(expr.getRight().getProperty(), is("b"));
 		assertThat(expr.getRight().getOperator(), is(Operator.NOT_EQUALS));
-		assertThat(expr.getRight().getValue(), is("2"));
+		assertThat(expr.getRight().getValue().toString(), is("2"));
 	}
 	
 	@Test

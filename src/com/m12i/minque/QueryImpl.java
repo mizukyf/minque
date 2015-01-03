@@ -93,17 +93,19 @@ final class QueryImpl<E> implements Query<E> {
 		return null;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes" })
 	private boolean evaluate(Expression expr, E elem) {
 		if (expr.isComparative()) {
 			final Object actual = accessor.accsess(elem, expr.getProperty());
 			final Operator op = expr.getOperator();
-			final String expected = expr.getValue();
+			final Object expected = expr.getValue();
 			
 			if (op.forNullable) {
 				return nullable(actual, op);
 			} else if (actual != null) {
-				if (op.forString) {
+				if (op.forObject) {
+					return object(actual, expected, op);
+				} else if (op.forString) {
 					return string(actual, expected, op);
 				} else if (op.forOrdered) {
 					final Comparable[] pair = makeComparablePair(actual, expected);
@@ -132,18 +134,26 @@ final class QueryImpl<E> implements Query<E> {
 		}
 	}
 	
-	private boolean string(final Object actual, final String expected, final Operator op) {
-		final String s = actual.toString();
-		if (op == Operator.CONTAINS) {
-			return s.contains(expected);
-		} else if (op == Operator.ENDS_WITH) {
-			return s.endsWith(expected);
-		} else if (op == Operator.EQUALS) {
-			return expected.equals(s);
+	private boolean object(final Object actual, final Object expected, final Operator op) {
+		final boolean asString = expected instanceof String;
+		if (op == Operator.EQUALS) {
+			return (asString ? actual.toString() : actual).equals(expected);
 		} else if (op == Operator.NOT_EQUALS) {
-			return !expected.equals(s);
+			return !(asString ? actual.toString() : actual).equals(expected);
+		} else {
+			throw new IllegalArgumentException();
+		}
+	}
+	
+	private boolean string(final Object actual, final Object expected, final Operator op) {
+		final String s = actual.toString();
+		final String s1 = expected.toString();
+		if (op == Operator.CONTAINS) {
+			return s.contains(s1);
+		} else if (op == Operator.ENDS_WITH) {
+			return s.endsWith(s1);
 		} else if (op == Operator.STARTS_WITH) {
-			return s.startsWith(expected);
+			return s.startsWith(s1);
 		} else {
 			throw new IllegalArgumentException();
 		}
@@ -175,39 +185,40 @@ final class QueryImpl<E> implements Query<E> {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private Comparable[] makeComparablePair(Object actual, String expected) {
+	private Comparable[] makeComparablePair(Object actual, Object expected) {
+		final String expectedString = expected.toString();
 		final Comparable[] result = new Comparable[2];
 		try {
 			if (actual instanceof Integer) {
 				result[0] = (Integer) actual;
-				result[1] = Integer.valueOf(expected);
+				result[1] = Integer.valueOf(expectedString);
 			} else if (actual instanceof Long) {
 				result[0] = (Long) actual;
-				result[1] = Long.valueOf(expected);
+				result[1] = Long.valueOf(expectedString);
 			} else if (actual instanceof Float) {
 				result[0] = (Float) actual;
-				result[1] = Float.valueOf(expected);
+				result[1] = Float.valueOf(expectedString);
 			} else if (actual instanceof Double) {
 				result[0] = (Double) actual;
-				result[1] = Double.valueOf(expected);
+				result[1] = Double.valueOf(expectedString);
 			} else if (actual instanceof Short) {
 				result[0] = (Short) actual;
-				result[1] = Short.valueOf(expected);
+				result[1] = Short.valueOf(expectedString);
 			} else if (actual instanceof Byte) {
 				result[0] = (Byte) actual;
-				result[1] = Byte.valueOf(expected);
-			} else if (actual instanceof Character && expected.length() == 1) {
+				result[1] = Byte.valueOf(expectedString);
+			} else if (actual instanceof Character && expectedString.length() == 1) {
 				result[0] = (Character) actual;
-				result[1] = expected.charAt(0);
+				result[1] = expectedString.charAt(0);
 			} else if (actual instanceof BigDecimal) {
 				result[0] = (BigDecimal) actual;
-				result[1] = new BigDecimal(expected);
+				result[1] = new BigDecimal(expectedString);
 			} else if (actual instanceof BigInteger) {
 				result[0] = (BigInteger) actual;
-				result[1] = new BigInteger(expected);
+				result[1] = new BigInteger(expectedString);
 			} else if (actual instanceof String) {
 				result[0] = actual.toString();
-				result[1] = expected;
+				result[1] = expectedString;
 			}
 		} catch (final NumberFormatException e) {
 			// Do nothing.
