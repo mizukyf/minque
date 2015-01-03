@@ -52,13 +52,22 @@ public final class QueryFactory<E> {
 				// JavaBeans規約に則ったgetter名を構成
 				final String getterName = "get" +
 						prop.substring(0, 1).toUpperCase() + prop.substring(1);
+				final String checkerName = "is" +
+						prop.substring(0, 1).toUpperCase() + prop.substring(1);
+				
 				// getterっぽいメソッドを格納したマップの要素キーと照合
 				if (methods.containsKey(getterName)) {
 					// JavaBeans規約に則ったgetterが存在すればそれを返す
 					return methods.get(getterName);
+					
+				} else if (methods.containsKey(checkerName)) {
+					// JavaBeans規約に則ったgetterが存在すればそれを返す
+					return methods.get(getterName);
+					
 				} else if (methods.containsKey(prop)) {
 					// プロパティと同名のメソッドが存在すればそれを返す
 					return methods.get(prop);
+					
 				} else {
 					// いずれにも該当しなければnullを返す
 					return null;
@@ -77,6 +86,7 @@ public final class QueryFactory<E> {
 					if (o == null) return null;
 					// getterの呼び出し結果を文字列化して返す
 					return o;
+					
 				} catch (Exception e) {
 					// 何らかの理由でメソッドコールが失敗したらともかくnullを返す
 					return null;
