@@ -3,7 +3,6 @@ package com.m12i.minque;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 final class QueryImpl<E> implements Query<E> {
