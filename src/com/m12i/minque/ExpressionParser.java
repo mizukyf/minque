@@ -1,10 +1,22 @@
 package com.m12i.minque;
 
+/**
+ * クエリ文字列をパースして式オブジェクトとプレースホルダ管理オブジェクトを返すパーサー.
+ */
 final class ExpressionParser extends AbstractParser<ExpressionParser.ExpressionAndPlaceholders> {
+	/**
+	 * 式オブジェクトとプレースホルダ管理オブジェクトをまとめるコンテナ・オブジェクト.
+	 */
 	static final class ExpressionAndPlaceholders {
+		/**
+		 * クエリ文字列の解析結果から作られた式オブジェクト.
+		 */
 		final Expression expression;
+		/**
+		 * プレースホルダ管理オブジェクト.
+		 */
 		final Placeholders placeholders;
-		ExpressionAndPlaceholders(final Expression e, final Placeholders ph) {
+		private ExpressionAndPlaceholders(final Expression e, final Placeholders ph) {
 			this.expression = e;
 			this.placeholders = ph;
 		}
