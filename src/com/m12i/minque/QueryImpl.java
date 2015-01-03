@@ -3,6 +3,7 @@ package com.m12i.minque;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 final class QueryImpl<E> implements Query<E> {
@@ -171,16 +172,20 @@ final class QueryImpl<E> implements Query<E> {
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private boolean ordered(final Comparable actual, final Comparable expected, final Operator op) {
-		if (op == Operator.LESS_THAN) {
-			return actual.compareTo(expected) < 0;
-		} else if (op == Operator.LESS_THAN_EQUAL) {
-			return actual.compareTo(expected) <= 0;
-		} else if (op == Operator.GREATER_THAN) {
-			return actual.compareTo(expected) > 0;
-		} else if (op == Operator.GREATER_THAN_EQUAL) {
-			return actual.compareTo(expected) >= 0;
-		} else {
-			throw new IllegalArgumentException();
+		try {
+			if (op == Operator.LESS_THAN) {
+				return actual.compareTo(expected) < 0;
+			} else if (op == Operator.LESS_THAN_EQUAL) {
+				return actual.compareTo(expected) <= 0;
+			} else if (op == Operator.GREATER_THAN) {
+				return actual.compareTo(expected) > 0;
+			} else if (op == Operator.GREATER_THAN_EQUAL) {
+				return actual.compareTo(expected) >= 0;
+			} else {
+				throw new IllegalArgumentException();
+			}
+		} catch (final ClassCastException e) {
+			return false;
 		}
 	}
 	
@@ -191,34 +196,38 @@ final class QueryImpl<E> implements Query<E> {
 		try {
 			if (actual instanceof Integer) {
 				result[0] = (Integer) actual;
-				result[1] = Integer.valueOf(expectedString);
+				result[1] =  expected instanceof Integer ? (Comparable)expected : Integer.valueOf(expectedString);
 			} else if (actual instanceof Long) {
 				result[0] = (Long) actual;
-				result[1] = Long.valueOf(expectedString);
+				result[1] = expected instanceof Long ? (Comparable)expected : Long.valueOf(expectedString);
 			} else if (actual instanceof Float) {
 				result[0] = (Float) actual;
-				result[1] = Float.valueOf(expectedString);
+				result[1] = expected instanceof Float ? (Comparable)expected : Float.valueOf(expectedString);
 			} else if (actual instanceof Double) {
 				result[0] = (Double) actual;
-				result[1] = Double.valueOf(expectedString);
+				result[1] = expected instanceof Double ? (Comparable)expected : Double.valueOf(expectedString);
 			} else if (actual instanceof Short) {
 				result[0] = (Short) actual;
-				result[1] = Short.valueOf(expectedString);
+				result[1] = expected instanceof Short ? (Comparable)expected : Short.valueOf(expectedString);
 			} else if (actual instanceof Byte) {
 				result[0] = (Byte) actual;
-				result[1] = Byte.valueOf(expectedString);
+				result[1] = expected instanceof Byte ? (Comparable)expected : Byte.valueOf(expectedString);
 			} else if (actual instanceof Character && expectedString.length() == 1) {
 				result[0] = (Character) actual;
-				result[1] = expectedString.charAt(0);
+				result[1] = expected instanceof Character ? (Comparable)expected : expectedString.charAt(0);
 			} else if (actual instanceof BigDecimal) {
 				result[0] = (BigDecimal) actual;
-				result[1] = new BigDecimal(expectedString);
+				result[1] = expected instanceof BigDecimal ? (Comparable)expected : new BigDecimal(expectedString);
 			} else if (actual instanceof BigInteger) {
 				result[0] = (BigInteger) actual;
-				result[1] = new BigInteger(expectedString);
+				result[1] = expected instanceof BigInteger ? (Comparable)expected : new BigInteger(expectedString);
 			} else if (actual instanceof String) {
 				result[0] = actual.toString();
 				result[1] = expectedString;
+			} else if (actual instanceof Comparable 
+					&& expected instanceof Comparable) {
+				result[0] = (Comparable)actual;
+				result[1] = (Comparable)expected;
 			}
 		} catch (final NumberFormatException e) {
 			// Do nothing.

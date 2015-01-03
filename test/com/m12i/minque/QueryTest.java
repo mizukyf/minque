@@ -4,6 +4,8 @@ import static org.junit.Assert.*;
 import static org.hamcrest.CoreMatchers.*;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -167,10 +169,14 @@ public class QueryTest {
 		private final int age;
 		private final String firstName;
 		private final String lastName;
+		private final Date birthDate;
 		public Person(final String firstName, final String lastName, final int age) {
 			this.age = age;
 			this.firstName = firstName;
 			this.lastName = lastName;
+			final Calendar cal = Calendar.getInstance();
+			cal.add(Calendar.YEAR, - age);
+			this.birthDate = cal.getTime();
 		}
 		public int getAge() {
 			return age;
@@ -180,6 +186,9 @@ public class QueryTest {
 		}
 		public String getLastName() {
 			return lastName;
+		}
+		public Date getBirthDate() {
+			return birthDate;
 		}
 	}
 	
@@ -207,5 +216,9 @@ public class QueryTest {
 		assertThat(firstNameQuery.countFrom(list, "fop"), is(0));
 		assertThat(firstNameQuery.countFrom(list, "fas"), is(2));
 		assertThat(firstNameQuery.countFrom(list, "fa"), is(3));
+		
+		final Query<Person> birthDateQuery = personQueryFactory.create("birthDate < ?");
+		assertThat(birthDateQuery.countFrom(list, "foo"), is(0));
+		assertThat(birthDateQuery.countFrom(list, new Date()), is(3));
 	}
 }

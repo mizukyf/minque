@@ -35,7 +35,7 @@ final class Placeholders {
 							list.size()));
 		}
 		for (int i = 0; i < listSize; i++) {
-			list.get(i).setValue(vars[i].toString());
+			list.get(i).setValue(vars[i]);
 		}
 	}
 }
