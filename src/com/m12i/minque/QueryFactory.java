@@ -24,7 +24,7 @@ public final class QueryFactory<E> {
 			});
 	}
 	/**
-	 * JavaBeansのコレクションのためのクエリ・ファクトリを生成する.
+	 * Java Beansのコレクションのためのクエリ・ファクトリを生成する.
 	 * @param elemType 検索対象コレクションの要素型
 	 * @return ファクトリ・オブジェクト
 	 */
