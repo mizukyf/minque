@@ -90,7 +90,7 @@ final class ExpressionParser extends AbstractParser<ExpressionParser.ExpressionA
 			final Operator op = parseComparativeOperator(in);
 			// 演算子が見つからなかった場合boolean型のプロパティとみなして式を補う
 			if (op == null) {
-				return Expression.comparative(Expression.property(prop), Operator.EQUALS, Expression.value("true"));
+				return Expression.comparative(Expression.property(prop), Operator.EQUALS, Expression.value(Boolean.TRUE));
 			}
 			
 			// 空白文字をスキップ

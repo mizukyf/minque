@@ -7,7 +7,7 @@ final class Expression {
 	private final Operator op;
 	private final Expression right;
 
-	private Expression(String prop, String value, Expression left, Operator op, Expression right) {
+	private Expression(String prop, Object value, Expression left, Operator op, Expression right) {
 		this.prop = prop;
 		this.value = value;
 		this.left = left;
@@ -17,7 +17,7 @@ final class Expression {
 	public static Expression property(String prop) {
 		return new Expression(prop, null, null, null, null);
 	}
-	public static Expression value(String value) {
+	public static Expression value(Object value) {
 		return new Expression(null, value, null, null, null);
 	}
 	public static Expression comparative(Expression propExpr, Operator binary, Expression valueExpr) {
