@@ -98,6 +98,13 @@ final int result2 = query2.countIn(target, "baz");
 この制約はバインド変数`?`を使うことで回避できます。
 等価性比較（`==`・`!=`）と大小比較（`<`・`<=`・`>`・`>=`）の際にはバインド変数の使用を検討してください。
 
+```java
+// バインド変数のプレースホルダは'?'
+final Query query0 = factory.create("value == ?");
+// クエリを実行するときにバインド変数を指定する
+final int result0 = query0.countIn(..., 123);
+```
+
 ### ショートカット
 
 クエリ内で演算子を伴わずプロパティ名だけを記述した場合、当該プロパティは`boolean`もしくは`Boolean`型であるものと仮定され、
@@ -105,6 +112,22 @@ final int result2 = query2.countIn(target, "baz");
 これは真偽値プロパティを扱う場合に可能となるショートカットであり、糖衣構文です
 （実際には`value == true`という記述はあくまでも文字列比較を行うものです。
 より厳密にショートカットしたのと同義の比較を行うにはバインド変数を使用する必要があります）。
+
+```java
+// 以下の3つのオペレーションはほぼ同義（3つめのみ厳密性に欠ける）
+
+// ショートカットを使う方法
+final Query query0 = factory.create("value");
+final int result0 = query0.countIn(...);
+
+// バインド変数で明示する方法
+final Query query1 = factory.create("value == ?");
+final int result1 = query0.countIn(..., true);
+
+// 文字列として比較する方法
+final Query query2 = factory.create("value == true");
+final int result2 = query0.countIn(...);
+```
 
 ### BNFチックな構文定義
 
