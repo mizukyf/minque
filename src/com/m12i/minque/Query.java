@@ -52,7 +52,7 @@ public interface Query<E> {
 	 * @return クエリ内容にマッチした要素の数
 	 * @throws IllegalArgumentException クエリ文字列にバインド変数のプレースホルダが含まれる場合
 	 */
-	int countFrom(Iterable<E> target);
+	int countIn(Iterable<E> target);
 	/**
 	 * クエリにマッチした要素の数を返す.
 	 * @param target 検索対象
@@ -60,5 +60,5 @@ public interface Query<E> {
 	 * @return クエリ内容にマッチした要素の数
 	 * @throws IllegalArgumentException クエリ文字列に含まれるプレースホルダの数とバインド変数の数が一致しない場合
 	 */
-	int countFrom(Iterable<E> target, Object... vars);
+	int countIn(Iterable<E> target, Object... vars);
 }

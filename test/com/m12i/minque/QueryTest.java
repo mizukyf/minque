@@ -161,10 +161,10 @@ public class QueryTest {
 	@Test
 	public void countTest00() {
 		final Query<HashMap<String, String>> q0 = create("key0 == ?");
-		final int res0 = q0.countFrom(list1, "foo");
+		final int res0 = q0.countIn(list1, "foo");
 		assertThat(res0, is(2));
 		
-		final int res1 = q0.countFrom(list1, "hello");
+		final int res1 = q0.countIn(list1, "hello");
 		assertThat(res1, is(1));
 	}
 	
@@ -206,23 +206,23 @@ public class QueryTest {
 		list.add(new Person("far", "boo", 60));
 		
 		final Query<Person> ageQuery = personQueryFactory.create("age < ?");
-		assertThat(ageQuery.countFrom(list, "foo"), is(0));
-		assertThat(ageQuery.countFrom(list, "20"), is(0));
-		assertThat(ageQuery.countFrom(list, 20), is(0));
-		assertThat(ageQuery.countFrom(list, 21), is(1));
-		assertThat(ageQuery.countFrom(list, "21"), is(1));
-		assertThat(ageQuery.countFrom(list, 40), is(1));
-		assertThat(ageQuery.countFrom(list, 41), is(2));
+		assertThat(ageQuery.countIn(list, "foo"), is(0));
+		assertThat(ageQuery.countIn(list, "20"), is(0));
+		assertThat(ageQuery.countIn(list, 20), is(0));
+		assertThat(ageQuery.countIn(list, 21), is(1));
+		assertThat(ageQuery.countIn(list, "21"), is(1));
+		assertThat(ageQuery.countIn(list, 40), is(1));
+		assertThat(ageQuery.countIn(list, 41), is(2));
 		
 		final Query<Person> firstNameQuery = personQueryFactory.create("firstName > ?");
-		assertThat(firstNameQuery.countFrom(list, "foo"), is(0));
-		assertThat(firstNameQuery.countFrom(list, "fop"), is(0));
-		assertThat(firstNameQuery.countFrom(list, "fas"), is(2));
-		assertThat(firstNameQuery.countFrom(list, "fa"), is(3));
+		assertThat(firstNameQuery.countIn(list, "foo"), is(0));
+		assertThat(firstNameQuery.countIn(list, "fop"), is(0));
+		assertThat(firstNameQuery.countIn(list, "fas"), is(2));
+		assertThat(firstNameQuery.countIn(list, "fa"), is(3));
 		
 		final Query<Person> birthDateQuery = personQueryFactory.create("birthDate < ?");
-		assertThat(birthDateQuery.countFrom(list, "foo"), is(0));
-		assertThat(birthDateQuery.countFrom(list, new Date()), is(3));
+		assertThat(birthDateQuery.countIn(list, "foo"), is(0));
+		assertThat(birthDateQuery.countIn(list, new Date()), is(3));
 	}
 	
 	public static final class TrueOrFalse {

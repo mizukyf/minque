@@ -44,7 +44,7 @@ final class QueryImpl<E> implements Query<E> {
 	}
 
 	@Override
-	public int countFrom(Iterable<E> source) {
+	public int countIn(Iterable<E> source) {
 		if (hasPlaceholders) {
 			throw new IllegalArgumentException("Bind variables is required for this query.");
 		}
@@ -58,7 +58,7 @@ final class QueryImpl<E> implements Query<E> {
 	}
 
 	@Override
-	public int countFrom(Iterable<E> source, Object... vars) {
+	public int countIn(Iterable<E> source, Object... vars) {
 		ph.bind(vars);
 		int result = 0;
 		for (final E elem : source) {
@@ -114,23 +114,23 @@ final class QueryImpl<E> implements Query<E> {
 			// 演算子の種類で処理分岐
 			if (op.forNullable) {
 				// nullチェック用演算子の場合
-				return nullable(actual, op);
+				return checkForNullability(actual, op);
 				
 			} else if (actual != null) {
 				// プロパティがnullでない場合
 				
 				if (op.forObject) {
 					// Objectの等価性を比較するための演算子の場合
-					return object(actual, expected, op);
+					return checkForObjectsEquality(actual, expected, op);
 					
 				} else if (op.forString) {
 					// 文字列の包含関係をチェックするための演算子の場合
-					return string(actual, expected, op);
+					return checkForStringMatching(actual, expected, op);
 					
 				} else if (op.forOrdered) {
 					// Comparable同士を大小比較するための演算子の場合
 					final Comparable[] pair = makeComparablePair(actual, expected);
-					return pair[1] != null && ordered(pair[0], pair[1], op);
+					return pair[1] != null && checkForOrderRelation(pair[0], pair[1], op);
 				}
 			}
 			
@@ -184,7 +184,7 @@ final class QueryImpl<E> implements Query<E> {
 	 * @return 評価結果
 	 * @throws IllegalArgumentException 未知の演算子や想定外の値が使用された場合
 	 */
-	private boolean object(final Object actual, final Object expected, final Operator op) {
+	private boolean checkForObjectsEquality(final Object actual, final Object expected, final Operator op) {
 		final boolean asString = expected instanceof String;
 		if (op == Operator.EQUALS) {
 			return (asString ? actual.toString() : actual).equals(expected);
@@ -203,7 +203,7 @@ final class QueryImpl<E> implements Query<E> {
 	 * @return 評価結果
 	 * @throws IllegalArgumentException 未知の演算子や想定外の値が使用された場合
 	 */
-	private boolean string(final Object actual, final Object expected, final Operator op) {
+	private boolean checkForStringMatching(final Object actual, final Object expected, final Operator op) {
 		final String s = actual.toString();
 		final String s1 = expected.toString();
 		if (op == Operator.CONTAINS) {
@@ -224,7 +224,7 @@ final class QueryImpl<E> implements Query<E> {
 	 * @return 評価結果
 	 * @throws IllegalArgumentException 未知の演算子や想定外の値が使用された場合
 	 */
-	private boolean nullable(final Object actual, final Operator op) {
+	private boolean checkForNullability(final Object actual, final Operator op) {
 		if (op == Operator.IS_NULL) {
 			return actual == null;
 		} else if (op == Operator.IS_NULL) {
@@ -245,7 +245,7 @@ final class QueryImpl<E> implements Query<E> {
 	 * @throws IllegalArgumentException 未知の演算子や想定外の値が使用された場合
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private boolean ordered(final Comparable actual, final Comparable expected, final Operator op) {
+	private boolean checkForOrderRelation(final Comparable actual, final Comparable expected, final Operator op) {
 		try {
 			if (op == Operator.LESS_THAN) {
 				return actual.compareTo(expected) < 0;
