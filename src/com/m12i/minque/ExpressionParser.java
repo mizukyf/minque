@@ -92,7 +92,7 @@ final class ExpressionParser extends AbstractParser<ExpressionParser.ExpressionA
 					value = parsers.parseQuotedString(in);
 					valExp = Expression.value(value);
 				} else {
-					// そうでない場合は、英数字とハイフンとアンダースコアのみからなる文字列としてパース
+					// 空白文字と特定の記号を含まない文字列としてパース
 					value = parseNonQuotedString(in);
 					valExp = Expression.value(value);
 					if (value.equals("?")){
@@ -171,7 +171,7 @@ final class ExpressionParser extends AbstractParser<ExpressionParser.ExpressionA
 	
 	/**
 	 * 引用符なしで記述された文字列（プロパティもしくは値）をパースして返す.
-	 * 使用可能な文字は、英数字、アンダスコア、そしてハイフンのみ。
+	 * 使用可能な文字は空白文字でなくかつ{@code ")=!^*$<>&|"}に含まれないもののみ。
 	 * @param in 入力データ
 	 * @return パースした文字列
 	 * @throws InputExeption 入力データ読み取り中にエラーが発生した場合
@@ -183,17 +183,13 @@ final class ExpressionParser extends AbstractParser<ExpressionParser.ExpressionA
 		while (in.unlessEof()) {
 			// 現在文字をチェック
 			final char c = in.current();
-			if (('0' <= c && c <= '9') || 
-					('A'  <= c && c <= 'Z') ||
-					('a' <= c && c <= 'z') ||
-					(c == '_' || c == '-' || c == '?')) {
-				// 許された文字列であればバッファに追加して次に文字に進む
-				sb.append(c);
-				in.next();
-			} else {
+			if (c <= ' ' || ")=!^*$<>&|".indexOf(c) != -1) {
 				// 許された文字以外が登場したらそこで処理を終える
 				break;
 			}
+			// 許された文字列であればバッファに追加して次に文字に進む
+			sb.append(c);
+			in.next();
 		}
 		if (sb.length() > 0) {
 			return sb.toString();
